@@ -1,6 +1,9 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_repo/models/habitation.dart';
 import 'package:flutter_repo/models/type_habitats.dart';
+import 'package:flutter_repo/share/location_style.dart';
+import 'package:flutter_repo/share/location_text_style.dart';
 
 void main() {
   runApp(const MyApp());
@@ -67,8 +70,25 @@ class MyHomePage extends StatelessWidget {
     return Expanded(
       child: Container(
         height: 80,
+        decoration: BoxDecoration(
+          color: LocationStyle.backgroundColorPurple,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        margin: EdgeInsets.all(8.0),
         child: Row(
-          children: [Icon(icon), Text(typeHabitat.libelle)],
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+                icon,
+                color: Colors.white70,
+            ),
+            SizedBox(width: 5),
+            Text(
+                typeHabitat.libelle,
+                style: LocationTextStyle.regularWhiteTextStyle,
+            )
+          ],
         ),
       )
     );
@@ -88,22 +108,39 @@ class MyHomePage extends StatelessWidget {
   }
 
   _buildRow(Habitation habitation, BuildContext context) {
+
+    var format = NumberFormat("### €");
+
     return Container(
       width: 248,
+      margin: EdgeInsets.all(4.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(
-            'assets/images/locations/${habitation.image}',
-            fit: BoxFit.fitWidth,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20.0),
+            child: Image.asset(
+              'assets/images/locations/${habitation.image}',
+              fit: BoxFit.fitWidth,
+            ),
           ),
-          Text(habitation.libelle),
+          Text(
+              habitation.libelle,
+              style: LocationTextStyle.regularTextStyle,
+          ),
           Row(
             children: [
               Icon(Icons.location_on_outlined),
-              Text(habitation.adresse),
+              Text(
+                  habitation.adresse,
+                  style: LocationTextStyle.regularTextStyle,
+              ),
             ],
           ),
-          Text(habitation.prixmois.toString()),
+          Text(
+              format.format(habitation.prixmois),
+              style: LocationTextStyle.boldTextStyle,
+          ),
         ],
       ),
     );
