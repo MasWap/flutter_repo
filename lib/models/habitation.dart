@@ -1,4 +1,4 @@
-class Habitaiton {
+class Habitation {
   int id;
   String image;
   String libelle;
@@ -7,7 +7,7 @@ class Habitaiton {
   int superficie;
   double prixmois;
 
-  Habitaiton(this.id, this.image, this.libelle, this.adresse, this.chambres,
+  Habitation(this.id, this.image, this.libelle, this.adresse, this.chambres,
       this.superficie, this.prixmois);
 }
 
