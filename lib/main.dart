@@ -1,3 +1,6 @@
+import 'package:flutter_repo/services/habitation_service.dart';
+import 'package:flutter_repo/share/habitation_option.dart';
+import 'package:flutter_repo/views/habitation_list.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_repo/models/habitation.dart';
@@ -26,37 +29,32 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
+  final HabitationService service = HabitationService();
   final String title;
-  MyHomePage({required this.title, Key? key}) : super(key: key);
+  late List<TypeHabitat> _typeHabitats;
+  late List<Habitation> _habitations;
 
-  final _typehabitats = [TypeHabitat(1, "Maison"), TypeHabitat(2, "Appartement")];
-  final _habitations = [
-    Habitation(1, "maison.png", "Maison méditerranéenne",
-        "12 Rue du Coq qui chante", 3, 92, 600),
-    Habitation(2, "appartement.png", "Appartement neuf", "Rue de la soif",
-        1, 50, 555),
-    Habitation(3, "appartement.png", "Appartement 1", "Rue 1", 1, 51, 401),
-    Habitation(4, "appartement.png", "Appartement 2", "Rue 2", 2, 52, 402),
-    Habitation(5, "maison.png", "Maison 1", "Rue M1", 3, 101, 701),
-    Habitation(6, "maison.png", "Maison 2", "Rue M2", 3, 102, 702),
-  ];
+  MyHomePage({required this.title, Key? key}) : super(key: key) {
+    _habitations = service.getHabitationsTop10();
+    _typeHabitats = service.getTypeHabitats();
+  }
 
-  _buildTypeHabitat() {
+  _buildTypeHabitat(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(6.0),
       height: 100,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(
-          _typehabitats.length,
-          (index) => _buildHabitat(_typehabitats[index]),
+          _typeHabitats.length,
+          (index) => _buildHabitat(context, _typeHabitats[index]),
         ),
       ),
     );
   }
 
-  _buildHabitat(TypeHabitat typeHabitat) {
-    var icon = Icons.house;
+  _buildHabitat(BuildContext context, TypeHabitat typeHabitat) {
+    IconData icon;
     switch (typeHabitat.id) {
       case 1:
         icon = Icons.house;
@@ -71,28 +69,37 @@ class MyHomePage extends StatelessWidget {
       child: Container(
         height: 80,
         decoration: BoxDecoration(
-          color: LocationStyle.backgroundColorPurple,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        margin: EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-                icon,
-                color: Colors.white70,
-            ),
-            SizedBox(width: 5),
-            Text(
-                typeHabitat.libelle,
-                style: LocationTextStyle.regularWhiteTextStyle,
-            )
-          ],
-        ),
-      )
+            color: LocationStyle.backgroundColorPurple,
+            borderRadius: BorderRadius.circular(8.0)),
+        margin: const EdgeInsets.all(8.0),
+        child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HabitationList(typeHabitat.id == 1),
+                ),
+              );
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.white70,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  typeHabitat.libelle,
+                  style: LocationTextStyle.regularWhiteTextStyle,
+                ),
+              ],
+            )),
+      ),
     );
   }
+
 
   _buildDerniereLocation(BuildContext context) {
     return Container(
@@ -107,6 +114,44 @@ class MyHomePage extends StatelessWidget {
     );
   }
 
+  _buildDetails(Habitation habitation) {
+    var format = NumberFormat("### €");
+
+    return Container(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: ListTile(
+                  title: Text(habitation.libelle),
+                  subtitle: Text(habitation.addresse),
+                ),
+              ),
+          Expanded(
+            flex: 1,
+            child: Text(format.format(habitation.prixmois),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Roboto',
+              fontSize: 22,
+            ),),
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          HabitationOption(Icons.group, "${habitation.chambres} personnes"),
+          HabitationOption(Icons.fit_screen, "${habitation.superficie} m2"),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   _buildRow(Habitation habitation, BuildContext context) {
 
     var format = NumberFormat("### €");
@@ -115,32 +160,19 @@ class MyHomePage extends StatelessWidget {
       width: 248,
       margin: EdgeInsets.all(4.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-            child: Image.asset(
-              'assets/images/locations/${habitation.image}',
-              fit: BoxFit.fitWidth,
+          Container(
+            height: 150,
+            width: MediaQuery.of(context).size.width,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: Image.asset(
+                'assets/images/locations/${habitation.image}',
+                fit: BoxFit.fitWidth,
+              ),
             ),
           ),
-          Text(
-              habitation.libelle,
-              style: LocationTextStyle.regularTextStyle,
-          ),
-          Row(
-            children: [
-              Icon(Icons.location_on_outlined),
-              Text(
-                  habitation.adresse,
-                  style: LocationTextStyle.regularTextStyle,
-              ),
-            ],
-          ),
-          Text(
-              format.format(habitation.prixmois),
-              style: LocationTextStyle.boldTextStyle,
-          ),
+          _buildDetails(habitation),
         ],
       ),
     );
@@ -156,7 +188,7 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 30),
-            _buildTypeHabitat(),
+            _buildTypeHabitat(context),
             SizedBox(height: 20),
             _buildDerniereLocation(context),
           ],
