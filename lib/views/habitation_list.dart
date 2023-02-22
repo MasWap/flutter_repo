@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_repo/models/habitation.dart';
 import 'package:flutter_repo/services/habitation_service.dart';
-import 'package:flutter_repo/views/habitation_option.dart';
+import 'package:flutter_repo/views/habitation_details.dart';
+import 'package:flutter_repo/views/share/habitation_features_widget.dart';
+import 'package:flutter_repo/views/share/habitation_option.dart';
 import 'package:intl/intl.dart';
 
 class HabitationList extends StatelessWidget {
@@ -10,7 +12,8 @@ class HabitationList extends StatelessWidget {
   final bool isHouseList;
 
   HabitationList(this.isHouseList, {Key? key}) : super(key: key) {
-    _habitations = isHouseList ? service.getMaisons() : service.getAppartements();
+    _habitations =
+    isHouseList ? service.getMaisons() : service.getAppartements();
   }
 
   _buildDetails(Habitation habitation) {
@@ -43,13 +46,7 @@ class HabitationList extends StatelessWidget {
               ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              HabitationOption("${habitation.chambres} personnes", Icons.group),
-              HabitationOption("${habitation.superficie} m²", Icons.fit_screen)
-            ],
-          )
+          HabitationFeaturesWidget(habitation),
         ],
       ),
     );
@@ -58,28 +55,38 @@ class HabitationList extends StatelessWidget {
   _buildRow(Habitation habitation, BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(4.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // fixe la hauteur de la colonne
-        children: [
-          SizedBox(
-            height: 150,
-            width: MediaQuery.of(context).size.width,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: Image.asset(
-                "assets/images/locations/${habitation.image}",
-                fit: BoxFit.fitWidth,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => HabitationDetails(habitation)),
+          );
+        },
+        child: Column(
+          children: [
+            SizedBox(
+              height: 150,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20.0),
+                child: Image.asset(
+                  "assets/images/locations/${habitation.image}",
+                  fit: BoxFit.fitWidth,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 8), // ajoute un espace entre les deux widgets
-          _buildDetails(habitation),
-        ],
+            _buildDetails(habitation),
+          ],
+        ),
       ),
     );
   }
 
-
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

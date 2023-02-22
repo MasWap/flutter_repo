@@ -1,50 +1,47 @@
+import 'package:flutter_repo/models/habitation.dart';
+import 'package:flutter_repo/models/habitation_data.dart';
 import 'package:flutter_repo/models/type_habitats.dart';
-
-import '../models/habitation.dart';
+import 'package:flutter_repo/models/typehabitat_data.dart';
 
 class HabitationService {
-  // Different type of habitats
-  final _typehabitats = [TypeHabitat(1, "Maison"), TypeHabitat(2, "Appartement")];
-  // Generate 30 random habitations
-  final _habitations = List.generate(30, (index) {
-    bool maison = index%3==0;
-    return Habitation(
-        index,
-        maison ? TypeHabitat(1, "Maison") : TypeHabitat(2, "Appartement"),
-        maison ? "maison.png" : "appartement.png",
-        "${maison ? "Maison" : "Appartement"} $index",
-        "Rue $index",
-        2 + index%3,
-        (maison ? 100 : 50) + index,
-        ((maison ? 600 : 400) + index).toDouble()
-    );
-  });
 
+  var  _typeHabitats;
+  var _habitations;
 
- List<TypeHabitat> getTypeHabitats() {
-   return _typehabitats;
- }
+  HabitationService() {
+    // Different type of habitats
+    _typeHabitats = TypehabitatData.buildList();
+    // Generate 30 random habitations
+    _habitations = HabitationsData.buildList();
+  }
 
- List<Habitation> getHabitationsTop10() {
-   return _habitations
-       .where((element) => element.id%2 == 1)
-       .take(10)
-       .toList();
- }
+  /// Get all types of habitat
+  List<TypeHabitat> getTypeHabitats() {
+    return _typeHabitats;
+  }
 
- List<Habitation> getMaisons() {
-   return _getHabitations(isHouse: true);
- }
+  /// Get the top 10 habitations
+  List<Habitation> getHabitationsTop10() {
+    return _habitations
+        .where((habitation) => habitation.id%2 == 1)
+        .take(10)
+        .toList();
+  }
 
- List<Habitation> getAppartements() {
-   return _getHabitations(isHouse: false);
- }
+  /// Get all habitations of maison type
+  List<Habitation> getMaisons() {
+    return _getHabitations(isHouse: true);
+  }
 
- List<Habitation> _getHabitations({bool isHouse = true}) {
-   return _habitations
-       .where((element) => element.typeHabitat.id == (isHouse ? 1 : 2))
-       .toList();
- }
+  /// Get all habitations of appartements type
+  List<Habitation> getAppartements() {
+    return _getHabitations(isHouse: false);
+  }
 
-
+  /// Get habitations depending on the type habitat (appartement, maison)
+  List<Habitation> _getHabitations({bool isHouse = true})  {
+    return _habitations
+        .where((habitation) => habitation.typeHabitat.id == (isHouse ? 1 : 2))
+        .toList();
+  }
 }
