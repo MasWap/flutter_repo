@@ -14,3 +14,4 @@ class Habitation {
       this.superficie, this.prixmois);
 }
 
+

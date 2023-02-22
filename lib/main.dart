@@ -1,5 +1,4 @@
 import 'package:flutter_repo/services/habitation_service.dart';
-import 'package:flutter_repo/share/habitation_option.dart';
 import 'package:flutter_repo/views/habitation_list.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Locations',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -114,65 +114,45 @@ class MyHomePage extends StatelessWidget {
     );
   }
 
-  _buildDetails(Habitation habitation) {
-    var format = NumberFormat("### €");
-
-    return Container(
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: ListTile(
-                  title: Text(habitation.libelle),
-                  subtitle: Text(habitation.addresse),
-                ),
-              ),
-          Expanded(
-            flex: 1,
-            child: Text(format.format(habitation.prixmois),
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Roboto',
-              fontSize: 22,
-            ),),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          HabitationOption(Icons.group, "${habitation.chambres} personnes"),
-          HabitationOption(Icons.fit_screen, "${habitation.superficie} m2"),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   _buildRow(Habitation habitation, BuildContext context) {
-
-    var format = NumberFormat("### €");
-
+    var format = NumberFormat("### €");
     return Container(
-      width: 248,
-      margin: EdgeInsets.all(4.0),
+      width: 240,
+      margin: const EdgeInsets.all(4.0),
       child: Column(
+        // https://stackoverflow.com/questions/53850149/flutter-crossaxisalignment-vs-mainaxisalignment
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 150,
-            width: MediaQuery.of(context).size.width,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: Image.asset(
-                'assets/images/locations/${habitation.image}',
-                fit: BoxFit.fitWidth,
-              ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20.0),
+            child: Image.asset(
+              "assets/images/locations/${habitation.image}",
+              fit: BoxFit.fitWidth,
             ),
           ),
-          _buildDetails(habitation),
+          Text(
+            habitation.libelle,
+            style: LocationTextStyle.regularTextStyle.copyWith(
+              color: Colors.black, // change color here
+            ),
+          ),
+          Row(
+            children: [
+              const Icon(Icons.location_on_outlined, color: Colors.green),
+              Text(
+                habitation.addresse,
+                style: LocationTextStyle.regularTextStyle.copyWith(
+                  color: Colors.black, // change color here
+                ),
+              ),
+            ],
+          ),
+          Text(
+            format.format(habitation.prixmois),
+            style: LocationTextStyle.boldTextStyle.copyWith(
+              color: Colors.black, // change color here
+            ),
+          ),
         ],
       ),
     );
